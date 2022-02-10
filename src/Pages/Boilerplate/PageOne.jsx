@@ -1,7 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
+import { v4 } from 'uuid';
+import { UserContext } from '../../Services/UserContext'
 
 //ACTIONS
 import { boilerplate } from '../../Services/Actions/boilerplate'
@@ -11,39 +13,42 @@ function PageOne ({
   boilerplateData,
 }) {
   const [pageLoader, setPageLoader] = useState(false);
+  const [localUsers, setLocalUsers] = useState([]);
+  const { users, setUsers } = useContext(UserContext);
 
   useEffect(() => {
-    setBoilerplateData({
-      'URL': 'https://jsonplaceholder.typicode.com/todos/1',
-      setPageLoader,
-    });
+    setLocalUsers(users);
   }, []);
 
-  function changeState() {
-    setBoilerplateData({
-      'URL': 'https://jsonplaceholder.typicode.com/todos/1',
-      setPageLoader,
-    });
+  function onSubmit(event) {
+    event.preventDefault();
+
+    const userObj = {
+      uid: v4(),
+      name: event.target[0].value,
+      loans: [],
+    };
+    const newLocalUsers = localUsers.concat([userObj]);
+
+    setLocalUsers(newLocalUsers);
+    setUsers(newLocalUsers);
   }
 
+  console.log(localUsers ? localUsers.length : 0, 'HEY', localUsers);
   return (
     <div className='pageone'>
       {
         pageLoader ? <>LOADING DATA FOR PAGE 1.................</> : 
         <>
-          <div>PAGE 1</div>
+          <div>PAGE 1 - Users In DB Are: {localUsers.length}</div>
 
-          <div>STATE DATA: {boilerplateData.my_state ? `${boilerplateData.my_state.id} ${boilerplateData.my_state.title}` : 'NO DATA'}</div>
-
-          <div style={{
-            border: '1px solid black',
-            padding: '10px',
-            width: '30%',
-            margin: '0 auto'
-          }}
-          onClick={changeState}>
-            CLICK HERE TO CHANGE STATE
-          </div>
+          <form onSubmit={onSubmit}>
+            <label>
+              NAME:
+              <input type="text" />
+            </label>
+            <input type="submit" value="Submit" />
+          </form>
 
           <NavLink to={'/page-two'}>
             GOTO PAGE 2
@@ -56,7 +61,7 @@ function PageOne ({
 
 const mapStateToProps = (state) => {
   return {
-    boilerplateData: state.boilerplate,
+    boilerplateData: state.boilerplate.users,
   };
 };
 

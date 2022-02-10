@@ -3,13 +3,12 @@ import axios from 'axios';
 
 export const boilerplate = (params) => async(dispatch) => {
   try {
-    const { URL, setPageLoader } = params;
+    const { users, setPageLoader } = params;
     setPageLoader(true);
-    const res = await axios.get(`${URL}`);
 
-    dispatch({
+    await dispatch({
       type: BOILERPLATE,
-      payload: res.data,
+      payload: users,
     });
     setPageLoader(false);
   } catch (error) {

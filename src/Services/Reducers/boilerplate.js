@@ -2,7 +2,7 @@
 import { BOILERPLATE } from '../Constants';
 
 const initialState = {
-  my_state: {},
+  users: [],
 };
 
 export default function (state = initialState, action) {
@@ -10,7 +10,7 @@ export default function (state = initialState, action) {
     case BOILERPLATE:
       return {
         ...state,
-        my_state: action.payload,
+        users: action.payload,
       };
     default:
       return state;
