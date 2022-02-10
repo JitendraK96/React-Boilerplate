@@ -1,19 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import uuid from 'react-native-uuid';
-
-//ACTIONS
-import { boilerplate } from '../../Services/Actions/boilerplate'
 
 //UTILS
 import { getLocalStorage, setLocalStorage } from '../../Services/LocalStorage'
 
+//ACTIONS
+import { boilerplate } from '../../Services/Actions/boilerplate'
+
 //VALIDATION
 import { validateString } from '../../Services/Utils'
 
-function PageOne ({
+function PageTwo ({
   setBoilerplateData,
   boilerplateData,
 }) {
@@ -27,26 +27,32 @@ function PageOne ({
 
   function onSubmit(event) {
     event.preventDefault();
-    const newData = localData.concat([
-      {
-        name: event.target[0].value,
-        cid: uuid.v4(),
-        loans: []
+    for (let i = 0; i < localData.length; i += 1) {
+      if (localData[i].cid === cid) {
+        localData[i].loans.push({
+          description: event.target[0].value,
+          quantity: event.target[1].value,
+          lid: uuid.v4(),
+        });
       }
-    ])
-    setLocalData(newData);
-    setLocalStorage(newData);
+    }
+
+    setLocalData(localData);
+    setLocalStorage(localData);
   }
 
+  const search = useLocation().search;
+  const cid = new URLSearchParams(search).get('cid');
+
   return (
-    <div className='pageone'>
+    <div className='addloan'>
       <span>NO OF PEOPLE IN DB ARE {localData.length}</span>
-      <h1>NEW PEOPLE FORM</h1>
+      <div>ADD LOANS FOR {cid}</div>
 
       <form onSubmit={onSubmit}>
         <label>
-          NAME: 
-          <input type='text' name='Name' onChange={((data) => {
+          DESCRIPTION: 
+          <input type='text' name='Description' onChange={((data) => {
             const { error } = validateString(data.target.value);
             if (error) {
               setIsSubmitEnabled(true);
@@ -54,12 +60,24 @@ function PageOne ({
               setIsSubmitEnabled(false);
             }
           })}></input>
-          <input type='submit' value='Submit' disabled={isSubmitEnabled}/>
         </label>
+        <label>
+          QUANTITY: 
+          <input type='number' name='Quantity' onChange={((data) => {
+            const { error } = validateString(data.target.value);
+            if (error) {
+              setIsSubmitEnabled(true);
+            } else {
+              setIsSubmitEnabled(false);
+            }
+          })}></input>
+        </label>
+        
+        <input type='submit' value='Submit' disabled={isSubmitEnabled}/>
       </form>
 
       <NavLink to={'/page-two'}>
-        GOTO PEOPLE LOANS
+        GOTO PEOPLES
       </NavLink>
     </div>
   )
@@ -77,4 +95,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(PageOne);
+export default connect(mapStateToProps, mapDispatchToProps)(PageTwo);
